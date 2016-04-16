@@ -14,6 +14,7 @@ chmod +x configure
 ./configure --prefix=${PREFIX}\
             --enable-linux-lfs \
             --enable-silent-rules \
+            --enable-shared \
             --with-ssl \
             --with-zlib \
             --with-jpeg \
