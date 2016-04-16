@@ -22,13 +22,13 @@ requirements:
         - python  # [win]
         - cmake  # [win]
         - msinttypes  # [win and py<35]
-        - jpeg
-        - zlib
         - bison  # [unix]
         - flex  # [unix]
-    run:
-        - jpeg
         - zlib
+        - jpeg 9b
+    run:
+        - zlib
+        - jpeg 9b
 
 test:
     commands:
