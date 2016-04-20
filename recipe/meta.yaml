@@ -12,7 +12,7 @@ source:
         - HDFTests.c.patch  # [win]
 
 build:
-    number: 1
+    number: 2
     features:
         - vc9  # [win and py27]
         - vc10  # [win and py34]
@@ -25,11 +25,11 @@ requirements:
         - msinttypes  # [win and py<35]
         - bison  # [unix]
         - flex  # [unix]
-        - zlib
-        - jpeg 9b
+        - zlib 1.2*
+        - jpeg 9*
     run:
-        - zlib
-        - jpeg 9b
+        - zlib 1.2*
+        - jpeg 9*
 
 test:
     commands:
