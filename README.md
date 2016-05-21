@@ -1,7 +1,7 @@
 About hdf4
 ==========
 
-Home: http://www.hdfgroup.org/HDF4/
+Home: http://www.hdfgroup.org/HDF4
 
 Package license: BSD-3-Clause
 
