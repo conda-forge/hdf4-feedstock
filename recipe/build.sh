@@ -28,5 +28,9 @@ make install
 # Remove man pages.
 rm -rf ${PREFIX}/share
 
+# Avoid clashing names with netcdf.
+mv ${PREFIX}/bin/ncdump ${PREFIX}/bin/h4_ncdump
+mv ${PREFIX}/bin/ncgen ${PREFIX}/bin/h4_ncgen
+
 # People usually Google these.
 rm -rf ${PREFIX}/examples

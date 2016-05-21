@@ -33,8 +33,9 @@ requirements:
 
 test:
     commands:
-        # Not sure how to create the `.exe` on Windows.
         - hdiff -V  # [unix]
+        - h4_ncgen -V  # [unix]
+        - h4_ncdump -V  # [unix]
         - test -f ${PREFIX}/lib/libdf.a  # [unix]
         - test -f ${PREFIX}/lib/libmfhdf.a  # [unix]
         - test -f ${PREFIX}/lib/libdf.so  # [linux]
