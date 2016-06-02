@@ -10,6 +10,8 @@ source:
     sha256: bb0e900b8cc6bc89a5730abc97e654e7705e8e1fbc4e0d4477f417822428d99b
     patches:
         - HDFTests.c.patch  # [win]
+        - max_files.patch
+
 
 build:
     number: 4
