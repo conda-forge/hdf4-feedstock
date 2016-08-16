@@ -8,6 +8,8 @@ source:
     fn: hdf-{{ version }}.tar.bz2
     url: http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-{{ version }}.tar.bz2
     sha256: 2d224a57a711d853d71b92ef0875d295b410454b005144ebd3dd4b3d4c811208
+    patches:
+        - max_files.patch
 
 build:
     number: 0
