@@ -1,4 +1,4 @@
-{% set version = "4.2.11" %}
+{% set version = "4.2.12" %}
 
 package:
     name: hdf4
@@ -7,12 +7,10 @@ package:
 source:
     fn: hdf-{{ version }}.tar.bz2
     url: http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-{{ version }}.tar.bz2
-    sha256: bb0e900b8cc6bc89a5730abc97e654e7705e8e1fbc4e0d4477f417822428d99b
-    patches:
-        - HDFTests.c.patch  # [win]
+    sha256: 2d224a57a711d853d71b92ef0875d295b410454b005144ebd3dd4b3d4c811208
 
 build:
-    number: 4
+    number: 0
     features:
         - vc9  # [win and py27]
         - vc10  # [win and py34]
@@ -42,12 +40,13 @@ test:
         - test -f ${PREFIX}/lib/libdf.dylib  # [osx]
         - test -f ${PREFIX}/lib/libmfhdf.so  # [linux]
         - test -f ${PREFIX}/lib/libmfhdf.dylib  # [osx]
-        - conda inspect linkages -n _test hdf4  # [linux]
+        - conda inspect linkages -n _test hdf4  # [not win]
+        - conda inspect objects -n _test hdf4  # [osx]
 
 about:
     home: http://www.hdfgroup.org/HDF4/
-    license: BSD-3-Clause
-    summary: Library and multi-object file format for storing and managing data between machines
+    license: BSD 3-Clause
+    summary: 'Library and multi-object file format for storing and managing data between machines.'
     license_family: BSD
     license_file: COPYING
 

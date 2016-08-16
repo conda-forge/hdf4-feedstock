@@ -2,6 +2,9 @@ set LIB=%LIBRARY_LIB%;%LIB%
 set LIBPATH=%LIBRARY_LIB%;%LIBPATH%
 set INCLUDE=%LIBRARY_INC%;%INCLUDE%;%RECIPE_DIR%
 
+mkdir build_dir
+cd build_dir
+
 :: Configure step.
 cmake -G "NMake Makefiles" ^
       -D CMAKE_BUILD_TYPE=Release ^
