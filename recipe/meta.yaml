@@ -42,8 +42,8 @@ test:
         - test -f ${PREFIX}/lib/libdf.dylib  # [osx]
         - test -f ${PREFIX}/lib/libmfhdf.so  # [linux]
         - test -f ${PREFIX}/lib/libmfhdf.dylib  # [osx]
-        - conda inspect linkages -p ${CONDA_DEFAULT_ENV} hdf4  # [not win]
-        - conda inspect objects -p ${CONDA_DEFAULT_ENV} hdf4  # [osx]
+        #- conda inspect linkages -p $PREFIX hdf4  # [not win]
+        #- conda inspect objects -p $PREFIX hdf4  # [osx]
 
 about:
     home: http://www.hdfgroup.org/HDF4/
