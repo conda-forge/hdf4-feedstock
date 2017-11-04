@@ -1,59 +1,62 @@
-{% set version = "4.2.12" %}
+{% set version = "4.2.13" %}
 
 package:
-    name: hdf4
-    version: {{ version }}
+  name: hdf4
+  version: {{ version }}
 
 source:
-    fn: hdf-{{ version }}.tar.bz2
-    url: http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-{{ version }}.tar.bz2
-    sha256: 2d224a57a711d853d71b92ef0875d295b410454b005144ebd3dd4b3d4c811208
-    patches:
-        - max_files.patch
+  url: http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-{{ version }}.tar.bz2
+  sha256: 55d3a42313bda0aba7b0463687caf819a970e0ba206f5ed2c23724f80d2ae0f3
+  patches:
+    - max_files.patch
 
 build:
-    number: 0
-    features:
-        - vc9  # [win and py27]
-        - vc10  # [win and py34]
-        - vc14  # [win and py35]
+  number: 0
+  skip: True  # [win and py36]
+  features:
+    - vc9  # [win and py27]
+    - vc14  # [win and (py35 or py36)]
 
 requirements:
-    build:
-        - python  # [win]
-        - cmake  # [win]
-        - msinttypes  # [win and py<35]
-        - bison  # [unix]
-        - flex  # [unix]
-        - zlib 1.2.*
-        - jpeg 9*
-    run:
-        - zlib 1.2.*
-        - jpeg 9*
+  build:
+    - python  # [win]
+    - cmake  # [win]
+    - msinttypes  # [win and py<35]
+    - bison  # [not win]
+    - flex  # [not win]
+    - zlib 1.2.11
+    - jpeg 9*
+    - vc 9  # [win and py27]
+    - vc 14  # [win and (py35 or py36)]
+  run:
+    - zlib 1.2.11
+    - jpeg 9*
+    - vc 9  # [win and py27]
+    - vc 14  # [win and (py35 or py36)]
 
 test:
-    commands:
-        - hdiff -V  # [unix]
-        - h4_ncgen -V  # [unix]
-        - h4_ncdump -V  # [unix]
-        - test -f ${PREFIX}/lib/libdf.a  # [unix]
-        - test -f ${PREFIX}/lib/libmfhdf.a  # [unix]
-        - test -f ${PREFIX}/lib/libdf.so  # [linux]
-        - test -f ${PREFIX}/lib/libdf.dylib  # [osx]
-        - test -f ${PREFIX}/lib/libmfhdf.so  # [linux]
-        - test -f ${PREFIX}/lib/libmfhdf.dylib  # [osx]
-        #- conda inspect linkages -p $PREFIX hdf4  # [not win]
-        #- conda inspect objects -p $PREFIX hdf4  # [osx]
+  commands:
+    - hdiff -V  # [not win]
+    - h4_ncgen -V  # [not win]
+    - h4_ncdump -V  # [not win]
+    - test -f ${PREFIX}/lib/libdf.a  # [not win]
+    - test -f ${PREFIX}/lib/libmfhdf.a  # [not win]
+    - test -f ${PREFIX}/lib/libdf.so  # [linux]
+    - test -f ${PREFIX}/lib/libdf.dylib  # [osx]
+    - test -f ${PREFIX}/lib/libmfhdf.so  # [linux]
+    - test -f ${PREFIX}/lib/libmfhdf.dylib  # [osx]
+    - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
+    - conda inspect objects -p $PREFIX $PKG_NAME  # [osx]
 
 about:
-    home: http://www.hdfgroup.org/HDF4/
-    license: BSD 3-Clause
-    summary: 'Library and multi-object file format for storing and managing data between machines.'
-    license_family: BSD
-    license_file: COPYING
+  home: http://www.hdfgroup.org/HDF4/
+  license: BSD 3-Clause
+  summary: 'Library and multi-object file format for storing and managing data between machines.'
+  license_family: BSD
+  license_file: COPYING
 
 extra:
-    recipe-maintainers:
-        - groutr
-        - msarahan
-        - ocefpaf
+  recipe-maintainers:
+    - groutr
+    - msarahan
+    - ocefpaf

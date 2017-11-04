@@ -1,13 +1,13 @@
 About hdf4
 ==========
 
-Home: http://www.hdfgroup.org/HDF4/
+Home: 
 
-Package license: BSD 3-Clause
+Package license: 
 
 Feedstock license: BSD 3-Clause
 
-Summary: Library and multi-object file format for storing and managing data between machines.
+Summary: 
 
 
 
@@ -66,6 +66,7 @@ To manage the continuous integration and simplify feedstock maintenance
 Using the ``conda-forge.yml`` within this repository, it is possible to re-render all of
 this feedstock's supporting files (e.g. the CI configuration files) with ``conda smithy rerender``.
 
+For more information please check the [conda-forge documentation](https://conda-forge.org/docs/).
 
 Terminology
 ===========
