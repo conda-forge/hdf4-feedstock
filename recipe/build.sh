@@ -34,3 +34,5 @@ mv ${PREFIX}/bin/ncgen ${PREFIX}/bin/h4_ncgen
 
 # People usually Google these.
 rm -rf ${PREFIX}/examples
+
+find $PREFIX -name '*.la' -delete
