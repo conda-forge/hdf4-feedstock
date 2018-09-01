@@ -11,28 +11,23 @@ source:
     - max_files.patch
 
 build:
-  number: 1
-  skip: True  # [win and py36]
-  features:
-    - vc9  # [win and py27]
-    - vc14  # [win and (py35 or py36)]
+  number: 2
 
 requirements:
   build:
-    - python  # [win]
     - cmake  # [win]
-    - msinttypes  # [win and py<35]
+    - {{ compiler('fortran') }}
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+  host:
+    - msinttypes  # [win and vc<14]
     - bison  # [not win]
     - flex  # [not win]
-    - zlib 1.2.11
-    - jpeg 9*
-    - vc 9  # [win and py27]
-    - vc 14  # [win and (py35 or py36)]
+    - zlib
+    - jpeg
   run:
-    - zlib 1.2.11
-    - jpeg 9*
-    - vc 9  # [win and py27]
-    - vc 14  # [win and (py35 or py36)]
+    - zlib
+    - jpeg
 
 test:
   commands:
