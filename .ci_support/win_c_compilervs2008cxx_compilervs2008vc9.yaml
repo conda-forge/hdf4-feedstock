@@ -1,0 +1,27 @@
+c_compiler:
+- vs2008
+channel_sources:
+- conda-forge,defaults
+channel_targets:
+- conda-forge main
+cxx_compiler:
+- vs2008
+fortran_compiler:
+- flang
+jpeg:
+- '9'
+pin_run_as_build:
+  jpeg:
+    max_pin: x
+  vc:
+    max_pin: x
+  zlib:
+    max_pin: x.x
+vc:
+- '9'
+zip_keys:
+- - vc
+  - c_compiler
+  - cxx_compiler
+zlib:
+- '1.2'

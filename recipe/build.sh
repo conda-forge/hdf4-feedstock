@@ -34,3 +34,6 @@ mv ${PREFIX}/bin/ncgen ${PREFIX}/bin/h4_ncgen
 
 # People usually Google these.
 rm -rf ${PREFIX}/examples
+
+# We can remove this when we start using the new conda-build.
+find $PREFIX -name '*.la' -delete
