@@ -11,7 +11,7 @@ source:
     - max_files.patch
 
 build:
-  number: 1002
+  number: 2
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
@@ -19,11 +19,16 @@ build:
 
 requirements:
   build:
-    - cmake  # [win]
+    - cmake       # [win]
+    - bison       # [not win]
+    - flex        # [not win]
+    - make        # [not win]
+    # To build this on ppc64le we need to run autoreconf so:
+    - libtool     # [not win]
+    - automake    # [not win]
+    - autoconf    # [not win]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - bison  # [not win]
-    - flex  # [not win]
   host:
     - msinttypes  # [win and vc<14]
     - zlib
