@@ -1,0 +1,11 @@
+--- hdf/src/herr.h
++++ hdf/src/herr.h
+@@ -96,6 +96,7 @@
+ #  if defined _WIN32 && defined hdf_shared_EXPORTS
+ __declspec(dllexport)
+ #  endif
++const
+ # else
+ HDFERRPUBLIC
+ # endif /* _H_ERR_MASTER_ */
+
