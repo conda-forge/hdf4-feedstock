@@ -10,7 +10,6 @@ autoreconf -vfi
             --enable-silent-rules \
             --enable-shared \
             --with-ssl \
-            --with-zlib \
             --with-jpeg \
             --disable-netcdf \
             --disable-fortran \
