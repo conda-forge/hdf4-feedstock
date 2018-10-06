@@ -4,7 +4,7 @@
  #  if defined _WIN32 && defined hdf_shared_EXPORTS
  __declspec(dllexport)
  #  endif
-+const
++extern __attribute__ ((visibility("default")))
  # else
  HDFERRPUBLIC
  # endif /* _H_ERR_MASTER_ */
