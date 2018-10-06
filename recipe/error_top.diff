@@ -1,11 +1,14 @@
 --- hdf/src/herr.h
 +++ hdf/src/herr.h
-@@ -96,6 +96,7 @@
- #  if defined _WIN32 && defined hdf_shared_EXPORTS
- __declspec(dllexport)
- #  endif
+@@ -106,7 +106,9 @@
+ ;
+ #else /* defined(H4_BUILT_AS_DYNAMIC_LIB) */
+ # ifndef _H_ERR_MASTER_
+-HDFERRPUBLIC
 +extern __attribute__ ((visibility("default")))
- # else
- HDFERRPUBLIC
++#else
++__attribute__ ((visibility("default")))
  # endif /* _H_ERR_MASTER_ */
+ int32       error_top
+ # ifdef _H_ERR_MASTER_
 
