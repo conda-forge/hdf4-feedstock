@@ -2,6 +2,10 @@
 
 autoreconf -vfi
 
+if [ "$(uname)" == "Darwin" ]; then
+    export CXX="${CXX} -stdlib=libc++"
+fi
+
 # The --enable-silent-rules is needed because Travis CI dies on the long output from this build.
 ./configure --prefix=${PREFIX}\
             --host="${HOST}" \
@@ -19,7 +23,6 @@ autoreconf -vfi
 
 make
 make install
-make check
 
 # Remove man pages.
 rm -rf ${PREFIX}/share
