@@ -2,10 +2,6 @@
 
 autoreconf -vfi
 
-if [ "$(uname)" == "Darwin" ]; then
-    export CXX="${CXX} -stdlib=libc++"
-fi
-
 # The --enable-silent-rules is needed because Travis CI dies on the long output from this build.
 ./configure --prefix=${PREFIX}\
             --host="${HOST}" \
@@ -19,7 +15,8 @@ fi
             --disable-netcdf \
             --disable-fortran \
             --enable-using-memchecker \
-            --enable-clear-file-buffers 
+            --enable-clear-file-buffers \
+            --with-zlib="${PREFIX}" 
 
 make
 make install
