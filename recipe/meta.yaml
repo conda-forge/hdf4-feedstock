@@ -12,7 +12,7 @@ source:
     - error_top.diff
 
 build:
-  number: 2
+  number: 1002
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
