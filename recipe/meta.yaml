@@ -20,7 +20,7 @@ build:
 
 requirements:
   build:
-    - cmake       # [win]
+    - cmake
     - bison       # [not win]
     - flex        # [not win]
     - make        # [not win]
