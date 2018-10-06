@@ -9,10 +9,9 @@ source:
   sha256: 55d3a42313bda0aba7b0463687caf819a970e0ba206f5ed2c23724f80d2ae0f3
   patches:
     - max_files.patch
-    - error_top.diff
 
 build:
-  number: 2
+  number: 1002
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
