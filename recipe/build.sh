@@ -4,7 +4,8 @@ autoreconf -vfi
 
 # The --enable-silent-rules is needed because Travis CI dies on the long output from this build.
 ./configure --prefix=${PREFIX}\
-            --host=$HOST \
+            --host="${HOST}" \
+            --build="${BUILD}" \
             --enable-linux-lfs \
             --enable-silent-rules \
             --enable-shared \
@@ -12,7 +13,9 @@ autoreconf -vfi
             --with-zlib \
             --with-jpeg \
             --disable-netcdf \
-            --disable-fortran
+            --disable-fortran \
+            --enable-using-memchecker \
+            --enable-clear-file-buffers 
 
 make
 make install
