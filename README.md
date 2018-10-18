@@ -3,11 +3,11 @@ About hdf4
 
 Home: http://www.hdfgroup.org/HDF4/
 
-Package license: BSD 3-Clause
+Package license: BSD-3-Clause
 
 Feedstock license: BSD 3-Clause
 
-Summary: Library and multi-object file format for storing and managing data between machines.
+Summary: Library and multi-object file format for storing and managing data between machines
 
 
 
