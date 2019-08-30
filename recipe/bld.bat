@@ -22,15 +22,11 @@ cmake -G "NMake Makefiles" ^
 if errorlevel 1 exit 1
 
 :: Build.
-nmake
+cmake --build . --target install --config Release
 if errorlevel 1 exit 1
 
 :: Test.
 ctest
-if errorlevel 1 exit 1
-
-:: Install.
-nmake install
 if errorlevel 1 exit 1
 
 del %LIBRARY_PREFIX%\*.txt %LIBRARY_PREFIX%\COPYING
