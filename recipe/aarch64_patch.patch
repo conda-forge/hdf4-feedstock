@@ -1,0 +1,22 @@
+--- hdf-4.2.13/hdf/src/hdfi.h	2017-06-24 14:00:04.000000000 -0700
++++ hdf-4.2.13_mod/hdf/src/hdfi.h	2020-04-12 10:11:56.402628281 -0700
+@@ -917,8 +917,8 @@
+ 
+ 
+ /*-----------------------------------------------------*/
+-/* Power PC 5 64 */
+-#if defined __powerpc64__
++/* Power PC 5 64 or Arm 64 bit*/
++#if defined(__powerpc64__) || defined(__aarch64__)
+ 
+ #ifdef GOT_MACHINE
+ If you get an error on this line more than one machine type has been defined.
+@@ -965,7 +965,7 @@
+ #endif
+ 
+ /*-----------------------------------------------------*/
+-#endif /*power PC 5 64 */
++#endif /*power PC 5 64 or Arm 64 bit */
+ /* Linux 64 */
+ #if defined(__linux__) && defined __x86_64__  && !(defined  SUN)  /* i.e. 64-bit Linux  but not SunOS on Intel */
+ 

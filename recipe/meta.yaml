@@ -9,6 +9,8 @@ source:
   sha256: 55d3a42313bda0aba7b0463687caf819a970e0ba206f5ed2c23724f80d2ae0f3
   patches:
     - max_files.patch
+    # HDF4 didn't consider AARCH in their defined constants
+    - aarch64_patch.patch  # [aarch64]
 
 build:
   number: 1003
