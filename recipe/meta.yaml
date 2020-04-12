@@ -10,7 +10,9 @@ source:
   patches:
     - max_files.patch
     # HDF4 didn't consider AARCH in their defined constants
-    - aarch64_patch.patch  # [aarch64]
+    # - aarch64_patch.patch  # [aarch64]
+    # Taken from debian
+    - hdfi_debian.patch
 
 build:
   number: 1003
