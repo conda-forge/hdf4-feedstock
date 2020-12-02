@@ -11,7 +11,7 @@ source:
     - max_files.patch
 
 build:
-  number: 1003
+  number: 1004
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
