@@ -32,3 +32,7 @@ if errorlevel 1 exit 1
 :: Install.
 nmake install
 if errorlevel 1 exit 1
+
+:: Remove extraneous COPYING file that gets installed automatically
+:: https://github.com/conda-forge/hdf5-feedstock/issues/87
+del /f %PREFIX%\Library\COPYING
