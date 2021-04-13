@@ -11,7 +11,7 @@ source:
     - max_files.patch
 
 build:
-  number: 1004
+  number: 1005
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
@@ -29,6 +29,7 @@ requirements:
     - autoconf    # [not win]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - gnuconfig   # [unix]
   host:
     - msinttypes  # [win and vc<14]
     - zlib
