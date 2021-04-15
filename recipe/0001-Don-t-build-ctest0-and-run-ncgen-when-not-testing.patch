@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ryan Volz <ryan.volz@gmail.com>
+Date: Thu, 15 Apr 2021 16:48:06 -0400
+Subject: [PATCH] Don't build ctest0 (and run ncgen) when not testing.
+
+This fixes cross-compilation when an emulator is not used and tests are
+skipped.
+---
+ config/conclude.am      |  7 +++----
+ mfhdf/ncgen/Makefile.am | 10 ----------
+ 2 files changed, 3 insertions(+), 14 deletions(-)
+
+diff --git a/config/conclude.am b/config/conclude.am
+index 9696cfed..cf49c173 100644
+--- a/config/conclude.am
++++ b/config/conclude.am
+@@ -59,10 +59,9 @@ check-clean ::
+ 	    fi;                                                               \
+ 	done
+ 
+-# Tell Automake to build tests when the user types `make all' (this is
+-# not its default behavior).  Also build EXTRA_LIB and EXTRA_PROG since
+-# Automake won't build them automatically, either.
+-all-local: $(EXTRA_LIB) $(EXTRA_PROG) $(chk_TESTS)
++# Tell Automake to build EXTRA_LIB and EXTRA_PROG since
++# Automake won't build them automatically
++all-local: $(EXTRA_LIB) $(EXTRA_PROG)
+ 
+ # make install-doc doesn't do anything outside of doc directory, but
+ # Makefiles should recognize it.
+diff --git a/mfhdf/ncgen/Makefile.am b/mfhdf/ncgen/Makefile.am
+index 95e32216..6bc34601 100644
+--- a/mfhdf/ncgen/Makefile.am
++++ b/mfhdf/ncgen/Makefile.am
+@@ -26,16 +26,6 @@ ncgen_LDFLAGS = $(LT_STATIC_EXEC) $(AM_LDFLAGS)
+ 
+ bin_PROGRAMS = ncgen
+ 
+-if HDF_BUILD_NETCDF
+-if HDF_BUILD_FORTRAN
+-noinst_PROGRAMS = ctest0 ftest0
+-else 
+-noinst_PROGRAMS = ctest0
+-endif
+-else
+-noinst_PROGRAMS = ctest0
+-endif
+-
+ ## Information for building the "ncgen" program
+ ncgen_SOURCES = close.c escapes.c generate.c genlib.c getfill.c init.c      \
+                 load.c main.c ncgentab.c
+-- 
+2.30.2
+

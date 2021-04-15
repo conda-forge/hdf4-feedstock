@@ -9,6 +9,7 @@ source:
   sha256: 55d3a42313bda0aba7b0463687caf819a970e0ba206f5ed2c23724f80d2ae0f3
   patches:
     - max_files.patch
+    - 0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
 
 build:
   number: 1005
