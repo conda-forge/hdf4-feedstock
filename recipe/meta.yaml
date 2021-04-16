@@ -9,9 +9,10 @@ source:
   sha256: 55d3a42313bda0aba7b0463687caf819a970e0ba206f5ed2c23724f80d2ae0f3
   patches:
     - max_files.patch
+    - 0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
 
 build:
-  number: 1004
+  number: 1005
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
@@ -29,6 +30,7 @@ requirements:
     - autoconf    # [not win]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - gnuconfig   # [unix]
   host:
     - msinttypes  # [win and vc<14]
     - zlib

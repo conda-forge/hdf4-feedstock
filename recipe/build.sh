@@ -1,5 +1,10 @@
 #!/bin/bash
 
+set -x
+
+# Get an updated config.sub and config.guess
+cp $BUILD_PREFIX/share/gnuconfig/config.* .
+
 # The compiler flags interfere with th build and we need to overide them :-/
 if [[ $(uname) == Darwin ]]; then
   unset CPPFLAGS
@@ -27,7 +32,9 @@ make
 
 # ncgen segfaults on macOS
 if [[ $(uname) != Darwin ]]; then
+if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
 make check
+fi
 fi
 
 make install
