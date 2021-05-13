@@ -12,7 +12,7 @@ source:
     - 0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
 
 build:
-  number: 0
+  number: 1
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
