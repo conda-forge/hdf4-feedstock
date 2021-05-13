@@ -1,4 +1,4 @@
-{% set version = "4.2.13" %}
+{% set version = "4.2.15" %}
 
 package:
   name: hdf4
@@ -12,7 +12,7 @@ source:
     - 0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
 
 build:
-  number: 1005
+  number: 0
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
