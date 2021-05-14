@@ -12,7 +12,7 @@ source:
     - patches/0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
     - patches/debian/64bit.patch
     - patches/debian/hdf-4.2.10-aarch64.patch
-    - patches/debian/hdfi.h
+    - patches/debian/hdfi.h.patch
     - patches/debian/spelling-errors.patch
 
 build:
