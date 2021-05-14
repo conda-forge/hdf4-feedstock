@@ -1,18 +1,18 @@
-{% set version = "4.2.13" %}
+{% set version = "4.2.15" %}
 
 package:
   name: hdf4
   version: {{ version }}
 
 source:
-  url: http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-{{ version }}.tar.bz2
-  sha256: 55d3a42313bda0aba7b0463687caf819a970e0ba206f5ed2c23724f80d2ae0f3
+  url: https://support.hdfgroup.org/ftp/HDF/releases/HDF{{ version }}/src/hdf-{{ version }}.tar.bz2
+  sha256: bde035ef5a1cd5fdbd0a7f1fa5c17e98bbd599300189ac4d234f16e9bb7bcb12
   patches:
     - max_files.patch
     - 0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
 
 build:
-  number: 1005
+  number: 0
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
@@ -61,3 +61,4 @@ extra:
     - groutr
     - msarahan
     - ocefpaf
+    - matthiasdiener
