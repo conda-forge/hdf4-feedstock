@@ -1,0 +1,26 @@
+Description: Add Aarch64 support -only part of the original patch
+Author: Marcin Juswkiewicz
+Origin: https://bugs.launchpad.net/ubuntu/+source/libhdf4/+bug/1296303
+
+--- a/mfhdf/ncgen/ncgen.l
++++ b/mfhdf/ncgen/ncgen.l
+@@ -113,7 +113,7 @@ FloatInf|Infinity|Inf    {    /* float m
+             yyerror(errstr);
+         }
+ 
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || __powerpc64__ || defined __s390x__ || defined __aarch64__
+         if (dd < INT_MIN  ||  dd > INT_MAX)
+ #else
+         if (dd < LONG_MIN  ||  dd > LONG_MAX)
+--- a/mfhdf/ncgen/ncgenyy.c
++++ b/mfhdf/ncgen/ncgenyy.c
+@@ -991,7 +991,7 @@ YY_RULE_SETUP
+             yyerror(errstr);
+         }
+ 
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+         if (dd < INT_MIN  ||  dd > INT_MAX)
+ #else
+         if (dd < LONG_MIN  ||  dd > LONG_MAX)
