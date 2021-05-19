@@ -16,7 +16,7 @@ source:
     - patches/debian/spelling-errors.patch
 
 build:
-  number: 2
+  number: 3
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
@@ -59,6 +59,8 @@ about:
   summary: 'Library and multi-object file format for storing and managing data between machines'
   license_family: BSD
   license_file: COPYING
+  doc_url: https://support.hdfgroup.org/release4/doc/index.html
+  dev_url: https://github.com/HDFGroup/hdf4
 
 extra:
   recipe-maintainers:

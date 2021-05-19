@@ -9,6 +9,10 @@ Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/hdf4-feedstock/
 
 Summary: Library and multi-object file format for storing and managing data between machines
 
+Development: https://github.com/HDFGroup/hdf4
+
+Documentation: https://support.hdfgroup.org/release4/doc/index.html
+
 Current build status
 ====================
 
