@@ -1,51 +1,38 @@
 #!/bin/bash
 
-set -x
+set -ex
 
-# Get an updated config.sub and config.guess
-cp $BUILD_PREFIX/share/gnuconfig/config.* .
+# The Fortran code uses implicit casting, which newer gfortran versions don't allow
+export FFLAGS="${FFLAGS} -fallow-argument-mismatch"
 
-# The compiler flags interfere with th build and we need to overide them :-/
-if [[ $(uname) == Darwin ]]; then
-  unset CPPFLAGS
-  export CPPFLAGS="-Wl,-rpath,$PREFIX/lib -I${PREFIX}/include"
+# Link to settings in repository
+ln -s config/cmake/scripts/CTestScript.cmake CTestScript.cmake
+ln -s config/cmake/scripts/HDF4config.cmake HDF4config.cmake
 
-  unset LDFLAGS
-  export LDFLAGS="-L$PREFIX/lib -Wl,-rpath,$PREFIX/lib -headerpad_max_install_names"
-fi
+mkdir build
+cd build
+cmake ${CMAKE_ARGS} -G "Unix Makefiles" \
+      -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
+      -DCMAKE_PREFIX_PATH="${PREFIX}" \
+      -DCMAKE_BUILD_TYPE="Release" \
+      -DBUILD_SHARED_LIBS="ON" \
+      -DHDF4_NO_PACKAGES="ON" \
+      -DHDF4_BUILD_EXAMPLES="OFF" \
+      -DHDF4_BUILD_FORTRAN="ON" \
+      -DHDF4_ENABLE_NETCDF="OFF" \
+      -DHDF4_ENABLE_JPEG_LIB_SUPPORT="ON" \
+      -DHDF4_ENABLE_Z_LIB_SUPPORT="ON" \
+      -Wno-dev ..
 
-autoreconf -vfi
+make -j "${CPU_COUNT}"
 
-# The --enable-silent-rules is needed because Travis CI dies on the long output from this build.
-./configure --prefix=${PREFIX}\
-            --host=$HOST \
-            --enable-linux-lfs \
-            --enable-silent-rules \
-            --enable-shared \
-            --with-ssl \
-            --with-zlib \
-            --with-jpeg \
-            --disable-netcdf \
-            --disable-fortran
-
-make
-
-# ncgen segfaults on macOS
-if [[ $(uname) != Darwin ]]; then
-if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
-make check
-fi
-fi
+export CTEST_OUTPUT_ON_FAILURE=1
+make test
 
 make install
 
-
-# Remove man pages.
-rm -rf ${PREFIX}/share
-
-# Avoid clashing names with netcdf.
-mv ${PREFIX}/bin/ncdump ${PREFIX}/bin/h4_ncdump
-mv ${PREFIX}/bin/ncgen ${PREFIX}/bin/h4_ncgen
-
-# People usually Google these.
-rm -rf ${PREFIX}/examples
+# Link to old library name
+cd ${PREFIX}/lib
+ln -s libhdf.a libdf.a
+ln -s libhdf.so libdf.so
+ln -s libhdf.so.4 libdf.so.0
