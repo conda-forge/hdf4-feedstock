@@ -14,38 +14,34 @@ if [[ $(uname) == Darwin ]]; then
   export LDFLAGS="-L$PREFIX/lib -Wl,-rpath,$PREFIX/lib -headerpad_max_install_names"
 fi
 
-autoreconf -vfi
+# The code uses implicit casting, which newer gfortran versions don't allow
+export FFLAGS="${FFLAGS} -fallow-argument-mismatch"
 
-# The --enable-silent-rules is needed because Travis CI dies on the long output from this build.
-./configure --prefix=${PREFIX}\
-            --host=$HOST \
-            --enable-linux-lfs \
-            --enable-silent-rules \
-            --enable-shared \
-            --with-ssl \
-            --with-zlib \
-            --with-jpeg \
-            --disable-netcdf \
-            --disable-fortran
+# Link to settings in repository
+ln -s config/cmake/scripts/CTestScript.cmake CTestScript.cmake
+ln -s config/cmake/scripts/HDF4config.cmake HDF4config.cmake
 
-make
+mkdir build
+cd build
+cmake -G "Unix Makefiles" \
+      -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
+      -DCMAKE_PREFIX_PATH="${PREFIX}" \
+      -DCMAKE_BUILD_TYPE="Release" \
+      -DBUILD_SHARED_LIBS="ON" \
+      -DHDF4_NO_PACKAGES="ON" \
+      -DHDF4_BUILD_EXAMPLES="OFF" \
+      -DHDF4_BUILD_FORTRAN="ON" \
+      -DHDF4_ENABLE_NETCDF="OFF" \
+      -DHDF4_ENABLE_JPEG_LIB_SUPPORT="ON" \
+      -DHDF4_ENABLE_Z_LIB_SUPPORT="ON" \
+      -Wno-dev ..
 
-# ncgen segfaults on macOS
-if [[ $(uname) != Darwin ]]; then
-if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
-make check
-fi
-fi
-
+make -j "${CPU_COUNT}"
+make test
 make install
 
-
-# Remove man pages.
-rm -rf ${PREFIX}/share
-
-# Avoid clashing names with netcdf.
-mv ${PREFIX}/bin/ncdump ${PREFIX}/bin/h4_ncdump
-mv ${PREFIX}/bin/ncgen ${PREFIX}/bin/h4_ncgen
-
-# People usually Google these.
-rm -rf ${PREFIX}/examples
+# Link to old library name
+cd ${PREFIX}/lib
+ln -s libhdf.a libdf.a
+ln -s libhdf.so libdf.so
+ln -s libhdf.so.4 libdf.so.0
