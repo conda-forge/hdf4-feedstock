@@ -25,7 +25,10 @@ cmake ${CMAKE_ARGS} -G "Unix Makefiles" \
       -Wno-dev ..
 
 make -j "${CPU_COUNT}"
+
+export CTEST_OUTPUT_ON_FAILURE=1
 make test
+
 make install
 
 # Link to old library name
