@@ -1,20 +1,8 @@
 #!/bin/bash
 
-set -x
+set -ex
 
-# Get an updated config.sub and config.guess
-cp $BUILD_PREFIX/share/gnuconfig/config.* .
-
-# The compiler flags interfere with the build and we need to overide them :-/
-if [[ $(uname) == Darwin ]]; then
-  unset CPPFLAGS
-  export CPPFLAGS="-Wl,-rpath,$PREFIX/lib -I${PREFIX}/include"
-
-  unset LDFLAGS
-  export LDFLAGS="-L$PREFIX/lib -Wl,-rpath,$PREFIX/lib -headerpad_max_install_names"
-fi
-
-# The code uses implicit casting, which newer gfortran versions don't allow
+# The Fortran code uses implicit casting, which newer gfortran versions don't allow
 export FFLAGS="${FFLAGS} -fallow-argument-mismatch"
 
 # Link to settings in repository
@@ -23,7 +11,7 @@ ln -s config/cmake/scripts/HDF4config.cmake HDF4config.cmake
 
 mkdir build
 cd build
-cmake -G "Unix Makefiles" \
+cmake ${CMAKE_ARGS} -G "Unix Makefiles" \
       -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
       -DCMAKE_PREFIX_PATH="${PREFIX}" \
       -DCMAKE_BUILD_TYPE="Release" \

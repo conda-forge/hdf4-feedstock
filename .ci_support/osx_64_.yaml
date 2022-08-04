@@ -3,15 +3,19 @@ MACOSX_DEPLOYMENT_TARGET:
 c_compiler:
 - clang
 c_compiler_version:
-- '11'
+- '13'
 channel_sources:
-- conda-forge,defaults
+- conda-forge
 channel_targets:
 - conda-forge main
 cxx_compiler:
 - clangxx
 cxx_compiler_version:
-- '11'
+- '13'
+fortran_compiler:
+- gfortran
+fortran_compiler_version:
+- '9'
 jpeg:
 - '9'
 macos_machine:
@@ -26,5 +30,6 @@ target_platform:
 zip_keys:
 - - c_compiler_version
   - cxx_compiler_version
+  - fortran_compiler_version
 zlib:
 - '1.2'
