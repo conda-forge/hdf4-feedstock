@@ -31,6 +31,7 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ compiler('fortran') }}
+    - make   # [unix]
     - gnuconfig   # [unix]
   host:
     - msinttypes  # [win and vc<14]

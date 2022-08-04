@@ -34,7 +34,7 @@ cmake -G "Unix Makefiles" \
       -DHDF4_ENABLE_NETCDF="OFF" \
       -DHDF4_ENABLE_JPEG_LIB_SUPPORT="ON" \
       -DHDF4_ENABLE_Z_LIB_SUPPORT="ON" \
-      -Wno-dev ..
+      -Wno-dev ${CMAKE_ARGS} ..
 
 make -j "${CPU_COUNT}"
 make test
@@ -45,3 +45,4 @@ cd ${PREFIX}/lib
 ln -s libhdf.a libdf.a
 ln -s libhdf.so libdf.so
 ln -s libhdf.so.4 libdf.so.0
+ln -s libmfhdf.so.4 libmfhdf.so.0
