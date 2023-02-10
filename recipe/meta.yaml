@@ -5,9 +5,8 @@ package:
   version: {{ version }}
 
 source:
-  - git_url: https://github.com/HDFGroup/hdf4
-    git_rev: hdf-{{ version|replace(".", "_") }}
-    git_depth: 1
+  - url: https://support.hdfgroup.org/ftp/HDF/releases/HDF{{ version }}/src/hdf-{{ version }}.tar.bz2
+    sha256: bde035ef5a1cd5fdbd0a7f1fa5c17e98bbd599300189ac4d234f16e9bb7bcb12
     patches:
       - patches/max_files.patch
       - patches/0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
