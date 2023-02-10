@@ -17,7 +17,7 @@ source:
       - patches/debian/spelling-errors.patch
 
 build:
-  number: 4
+  number: 6
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
