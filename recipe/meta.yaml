@@ -5,18 +5,18 @@ package:
   version: {{ version }}
 
 source:
-  url: https://support.hdfgroup.org/ftp/HDF/releases/HDF{{ version }}/src/hdf-{{ version }}.tar.bz2
-  sha256: bde035ef5a1cd5fdbd0a7f1fa5c17e98bbd599300189ac4d234f16e9bb7bcb12
-  patches:
-    - patches/max_files.patch
-    - patches/0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
-    - patches/debian/64bit.patch
-    - patches/debian/hdf-4.2.10-aarch64.patch
-    - patches/debian/hdfi.h.patch
-    - patches/debian/spelling-errors.patch
+  - url: https://support.hdfgroup.org/ftp/HDF/releases/HDF{{ version }}/src/hdf-{{ version }}.tar.bz2
+    sha256: bde035ef5a1cd5fdbd0a7f1fa5c17e98bbd599300189ac4d234f16e9bb7bcb12
+    patches:
+      - patches/max_files.patch
+      - patches/0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
+      - patches/debian/64bit.patch
+      - patches/debian/hdf-4.2.10-aarch64.patch
+      - patches/debian/hdfi.h.patch
+      - patches/debian/spelling-errors.patch
 
 build:
-  number: 5
+  number: 6
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
@@ -24,16 +24,13 @@ build:
 
 requirements:
   build:
-    - cmake       # [win]
+    - cmake
     - bison       # [not win]
     - flex        # [not win]
-    - make        # [not win]
-    # To build this on ppc64le we need to run autoreconf so:
-    - libtool     # [not win]
-    - automake    # [not win]
-    - autoconf    # [not win]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ compiler('fortran') }}
+    - make   # [unix]
     - gnuconfig   # [unix]
   host:
     - msinttypes  # [win and vc<14]
@@ -45,12 +42,10 @@ requirements:
 
 test:
   commands:
-    - hdiff -V  # [not win]
-    - h4_ncgen -V  # [not win]
-    - h4_ncdump -V  # [not win]
-    - test -f ${PREFIX}/lib/libdf.a  # [not win]
+    - h4cc --version  # [not win]
+    - test -f ${PREFIX}/lib/libhdf.a  # [not win]
     - test -f ${PREFIX}/lib/libmfhdf.a  # [not win]
-    - test -f ${PREFIX}/lib/libdf${SHLIB_EXT}  # [not win]
+    - test -f ${PREFIX}/lib/libhdf${SHLIB_EXT}  # [not win]
     - test -f ${PREFIX}/lib/libmfhdf${SHLIB_EXT}  # [not win]
 
 about:
@@ -68,3 +63,4 @@ extra:
     - msarahan
     - ocefpaf
     - matthiasdiener
+    - adamcpovey
