@@ -12,8 +12,8 @@ cxx_compiler:
 - clangxx
 cxx_compiler_version:
 - '14'
-jpeg:
-- '9'
+libjpeg_turbo:
+- 2.1.4
 macos_machine:
 - x86_64-apple-darwin13.4.0
 target_platform:
