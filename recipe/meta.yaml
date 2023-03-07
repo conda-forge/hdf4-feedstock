@@ -1,4 +1,4 @@
-{% set version = "4.2.15" %}
+{% set version = "4.2.16" %}
 
 package:
   name: hdf4
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://support.hdfgroup.org/ftp/HDF/releases/HDF{{ version }}/src/hdf-{{ version }}.tar.bz2
-  sha256: bde035ef5a1cd5fdbd0a7f1fa5c17e98bbd599300189ac4d234f16e9bb7bcb12
+  sha256: 4b9c46b07f365a9150ddbf0e33589732be1ccdd7e7bbc978a37990259388b5e6
   patches:
     - patches/max_files.patch
     - patches/0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
@@ -16,7 +16,7 @@ source:
     - patches/debian/spelling-errors.patch
 
 build:
-  number: 5
+  number: 0
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
@@ -56,7 +56,7 @@ test:
 about:
   home: http://www.hdfgroup.org/HDF4/
   license: BSD-3-Clause
-  summary: 'Library and multi-object file format for storing and managing data between machines'
+  summary: Library and multi-object file format for storing and managing data between machines
   license_family: BSD
   license_file: COPYING
   doc_url: https://support.hdfgroup.org/release4/doc/index.html
