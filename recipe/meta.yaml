@@ -39,9 +39,6 @@ requirements:
     - msinttypes  # [win and vc<14]
     - zlib
     - libjpeg-turbo
-  run:
-    - zlib
-    - libjpeg-turbo
 
 test:
   commands:
