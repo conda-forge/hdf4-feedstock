@@ -32,8 +32,14 @@ make
 
 # ncgen segfaults on macOS
 if [[ $(uname) != Darwin ]]; then
-if [[ "${CONDA_BUILD_CROSS_COMPILATION}" != "1" ]]; then
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR}" != "" ]]; then
+# The following tests seems to fail on ppc64le when runing on azure with emulation
+# Testing reading of netCDF file using the SDxxx interface (tnetcdf.c)  
+# *** Routine netCDF Read Test 1. SDstart failed on file test1.nc FAILED at line 176 ***
+# *** Routine SDstart FAILED at line 83 ***
+if [[ "${target_platform}" != "linux-ppc64le" ]]; then
 make check
+fi
 fi
 fi
 
