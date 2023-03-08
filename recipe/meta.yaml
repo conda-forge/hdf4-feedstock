@@ -36,7 +36,6 @@ requirements:
     - {{ compiler('cxx') }}
     - gnuconfig   # [unix]
   host:
-    - msinttypes  # [win and vc<14]
     - zlib
     - libjpeg-turbo
 
