@@ -7,10 +7,8 @@ channel_targets:
 cxx_compiler:
 - vs2019
 libjpeg_turbo:
-- 2.1.5
+- '3'
 target_platform:
 - win-64
-vc:
-- '14'
 zlib:
 - '1.2'
