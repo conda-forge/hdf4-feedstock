@@ -10,10 +10,6 @@ source:
   patches:
     - patches/max_files.patch
     - patches/0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
-    - patches/debian/64bit.patch
-    - patches/debian/hdf-4.2.10-aarch64.patch
-    - patches/debian/hdfi.h.patch
-    - patches/debian/spelling-errors.patch
 
 build:
   number: 0
@@ -44,8 +40,8 @@ test:
     - hdiff -V  # [not win]
     - h4_ncgen -V  # [not win]
     - h4_ncdump -V  # [not win]
-    - test -f ${PREFIX}/lib/libdf.a  # [not win]
-    - test -f ${PREFIX}/lib/libmfhdf.a  # [not win]
+    - test ! -f ${PREFIX}/lib/libdf.a  # [not win]
+    - test ! -f ${PREFIX}/lib/libmfhdf.a  # [not win]
     - test -f ${PREFIX}/lib/libdf${SHLIB_EXT}  # [not win]
     - test -f ${PREFIX}/lib/libmfhdf${SHLIB_EXT}  # [not win]
 
