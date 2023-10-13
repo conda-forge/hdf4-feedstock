@@ -1,12 +1,12 @@
-{% set version = "4.2.16" %}
+{% set version = "4.2.16-2" %}
 
 package:
   name: hdf4
-  version: {{ version }}
+  version: 4.2.16
 
 source:
   url: https://support.hdfgroup.org/ftp/HDF/releases/HDF{{ version }}/src/hdf-{{ version }}.tar.bz2
-  sha256: 4b9c46b07f365a9150ddbf0e33589732be1ccdd7e7bbc978a37990259388b5e6
+  sha256: c5c3234b5012258aef2e4432f649b31c21b26015afba1857ad83640c3f2b692c
   patches:
     - patches/max_files.patch
     - patches/0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
