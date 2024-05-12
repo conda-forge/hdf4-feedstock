@@ -1,0 +1,13 @@
+diff --git a/configure.ac b/configure.ac
+index 03fd4e2d..13d3db51 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -803,7 +803,7 @@ AM_CONDITIONAL([HDF_BUILD_XDR], [test "X$BUILD_XDR" = "Xyes"])
+ ##
+ ## POSIX feature information can be found in the gcc manual at:
+ ## http://www.gnu.org/s/libc/manual/html_node/Feature-Test-Macros.html
+-CPPFLAGS="-D_POSIX_C_SOURCE=200809L $CPPFLAGS"
++# CPPFLAGS="-D_POSIX_C_SOURCE=200809L $CPPFLAGS"
+ 
+ ## ======================================================================
+ ## Checks for endianness functions
