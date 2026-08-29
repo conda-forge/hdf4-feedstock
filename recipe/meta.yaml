@@ -13,10 +13,12 @@ source:
     - patches/debian/64bit.patch
     - patches/debian/hdf-4.2.10-aarch64.patch
     - patches/debian/hdfi.h.patch
+    - patches/0002-Fix-build-errors-on-Windows-for-ARM64.patch
+    - patches/0003-Fix-modern-Clang-build.patch
     - patches/debian/spelling-errors.patch
 
 build:
-  number: 7
+  number: 8
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
@@ -34,12 +36,19 @@ requirements:
     - autoconf    # [not win]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ stdlib('c') }}
     - gnuconfig   # [unix]
   host:
     - zlib
     - libjpeg-turbo
 
 test:
+  requires:
+    - cmake  # [target_platform == "win-arm64"]
+    - {{ compiler('c') }}  # [target_platform == "win-arm64"]
+  files:
+    - CMakeLists.txt  # [target_platform == "win-arm64"]
+    - test_sd.c  # [target_platform == "win-arm64"]
   commands:
     - hdiff -V  # [not win]
     - h4_ncgen -V  # [not win]
@@ -48,6 +57,20 @@ test:
     - test -f ${PREFIX}/lib/libmfhdf.a  # [not win]
     - test -f ${PREFIX}/lib/libdf${SHLIB_EXT}  # [not win]
     - test -f ${PREFIX}/lib/libmfhdf${SHLIB_EXT}  # [not win]
+    - cmake -S . -B test-build -G "NMake Makefiles" -DHDF4_DIR=%LIBRARY_PREFIX%\\cmake\\hdf4  # [target_platform == "win-arm64"]
+    - if errorlevel 1 exit 1  # [target_platform == "win-arm64"]
+    - cmake --build test-build  # [target_platform == "win-arm64"]
+    - if errorlevel 1 exit 1  # [target_platform == "win-arm64"]
+    - test-build\\hdf4_consumer.exe  # [target_platform == "win-arm64"]
+    - if errorlevel 1 exit 1  # [target_platform == "win-arm64"]
+    - dumpbin /headers test-build\\hdf4_consumer.exe | findstr /I /C:"AA64 machine (ARM64)"  # [target_platform == "win-arm64"]
+    - if errorlevel 1 exit 1  # [target_platform == "win-arm64"]
+    - dumpbin /headers "%LIBRARY_BIN%\\hdf.dll" | findstr /I /C:"AA64 machine (ARM64)"  # [target_platform == "win-arm64"]
+    - if errorlevel 1 exit 1  # [target_platform == "win-arm64"]
+    - dumpbin /headers "%LIBRARY_BIN%\\mfhdf.dll" | findstr /I /C:"AA64 machine (ARM64)"  # [target_platform == "win-arm64"]
+    - if errorlevel 1 exit 1  # [target_platform == "win-arm64"]
+    - dumpbin /headers "%LIBRARY_BIN%\\xdr.dll" | findstr /I /C:"AA64 machine (ARM64)"  # [target_platform == "win-arm64"]
+    - if errorlevel 1 exit 1  # [target_platform == "win-arm64"]
 
 about:
   home: http://www.hdfgroup.org/HDF4/

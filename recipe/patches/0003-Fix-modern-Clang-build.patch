@@ -1,0 +1,285 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Clay Warren <warren.clay@icloud.com>
+Date: Sat, 29 Aug 2026 18:21:37 -0500
+Subject: [PATCH] Fix build with modern Clang
+
+Backport the minimal relevant fixes from upstream commits 31a9a69476c6,
+19937e59dce4, 8a4137d60e2d, 490abfc71219, 3f61fb461d2d,
+cbbda4b312ab, 38e08e0d12d2, and 9055b673990b.
+
+HDF4 4.2.15 predates C99 implicit-declaration diagnostics in modern Clang.
+Keep its existing DATAINFO_TESTER mechanism active before the public header
+is parsed; upstream removed that obsolete gate later in 218c8da49eda. Use the
+configured POSIX header for getopt because this release does not contain the
+bundled getopt header introduced later in 9be7f29942d2.
+
+diff --git a/mfhdf/libsrc/file.c b/mfhdf/libsrc/file.c
+--- a/mfhdf/libsrc/file.c
++++ b/mfhdf/libsrc/file.c
+@@ -23,6 +23,9 @@
+ #include    <string.h>
+ #include    <errno.h>
+ #include    "local_nc.h"
++#if defined(H4_HAVE_UNISTD_H) || defined(HAVE_UNISTD_H)
++#include <unistd.h> /* access(), F_OK */
++#endif
+ #include    "alloc.h"
+ #include    "herr.h"
+ 
+diff --git a/mfhdf/libsrc/xdrposix.c b/mfhdf/libsrc/xdrposix.c
+--- a/mfhdf/libsrc/xdrposix.c
++++ b/mfhdf/libsrc/xdrposix.c
+@@ -14,27 +14,12 @@
+  */
+ /* $Id$ */
+ 
+-/*
+- * 32-bit integer on the host architecture (on the CRAY, this is actually 64
+- * bits; however, a pointer to this type is still passed to the XDR functions
+- * x_getlong() and x_putlong(), so, on that platform, it doesn't matter if
+- * the following isn't 32-bits):
+- */
+-#ifndef NETLONG
+-#   define NETLONG  long
+-#endif
+-typedef NETLONG     netlong;
+-#undef  NETLONG
+-
++#include <stdint.h>
+ #include <string.h>
+ #include "local_nc.h" /* prototypes for NCadvis, nc_error */
+             /* also obtains <stdio.h>, <rpc/types.h>, &
+             * <rpc/xdr.h> */
+ 
+-#ifdef H4_HAVE_STDINT_H
+-# include <stdint.h>
+-#endif
+-
+ #ifdef H4_HAVE_UNISTD_H
+ # include <unistd.h>
+ #endif
+@@ -53,6 +38,9 @@
+ 
+ /*EIP #include "netcdf.h" */
+ #include "mfhdf.h"
++
++/* 32-bit integer on the host architecture */
++typedef int32_t netlong;
+ 
+ #if !(defined DOS_FS)
+         typedef u_int ncpos_t ;  /* all unicies */
+diff --git a/mfhdf/test/hdftest.h b/mfhdf/test/hdftest.h
+--- a/mfhdf/test/hdftest.h
++++ b/mfhdf/test/hdftest.h
+@@ -52,6 +52,9 @@
+ 
+ /*************************** Utility Functions ***************************/
+ 
++/* Generates the correct name for the test file */
++intn make_datafilename(char* basename, char* testfile, unsigned int size);
++
+ /* Calls SDcreate, SDwritedata, and SDendaccess */
+ int32 make_SDS(int32 sd_id, char* sds_name, int32 type, int32 rank,
+ 			  int32* dim_sizes, int32 unlim_dim, VOIDP written_data);
+@@ -74,6 +77,9 @@
+ /* Calls SDgetdatasize then verify the size against data_size */
+ void verify_datasize(int32 sds_id, int32 data_size, char* sds_name);
+ 
++/* Verifies the unlimited dimension's size and the variable's data. */
++int verify_info_data(int32 sds_id, int32 expected_dimsize, int16 *result);
++
+ /* Find and open an SDS by name */
+ int32 get_SDSbyName(int32 sd_id, char* sds_name);
+ 
+diff --git a/mfhdf/test/hdftest.c b/mfhdf/test/hdftest.c
+--- a/mfhdf/test/hdftest.c
++++ b/mfhdf/test/hdftest.c
+@@ -59,7 +59,7 @@
+ extern int test_coordvar();
+ extern int test_chunk();
+ extern int test_compression();
+-extern int test_dimension();
++extern int test_dimensions();
+ extern int test_attributes();
+ extern int test_datasizes();
+ extern int test_datainfo();
+diff --git a/mfhdf/test/tfile.c b/mfhdf/test/tfile.c
+--- a/mfhdf/test/tfile.c
++++ b/mfhdf/test/tfile.c
+@@ -18,6 +18,7 @@
+ #ifdef HDF
+ 
+ #include "hdftest.h"
++#include "local_nc.h"
+ 
+ /********************************************************************
+    Name: test_file_inuse() - tests preventing of an in-use file being
+diff --git a/mfhdf/test/tsd.c b/mfhdf/test/tsd.c
+--- a/mfhdf/test/tsd.c
++++ b/mfhdf/test/tsd.c
+@@ -42,7 +42,7 @@
+     TESTING("SDstart for file with no write permission (tsd.c)");
+ 
+     /* delete the file just to be sure */
+-    unlink(FILE_NAME);
++    remove(FILE_NAME);
+ 
+     /* Create a file */
+     fid = SDstart(FILE_NAME, DFACC_CREATE);
+diff --git a/mfhdf/test/tdatainfo.c b/mfhdf/test/tdatainfo.c
+--- a/mfhdf/test/tdatainfo.c
++++ b/mfhdf/test/tdatainfo.c
+@@ -22,6 +22,10 @@
+  *  test_extend_SDSs     - tests SDSs with unlimited dimensions
+  * -BMR, Jul 2010
+  ****************************************************************************/
++
++#ifndef DATAINFO_TESTER
++#define DATAINFO_TESTER /* to include mfdatainfo.h */
++#endif
+ 
+ #include "mfhdf.h"
+ 
+@@ -42,10 +46,6 @@
+ #if defined _WIN32
+ #define snprintf sprintf_s
+ #define ssize_t int32
+-#endif
+-
+-#ifndef DATAINFO_TESTER
+-#define DATAINFO_TESTER /* to include mfdatainfo.h */
+ #endif
+ 
+ #ifdef H4_HAVE_LIBSZ
+diff --git a/mfhdf/ncdump/ncdump.c b/mfhdf/ncdump/ncdump.c
+--- a/mfhdf/ncdump/ncdump.c
++++ b/mfhdf/ncdump/ncdump.c
+@@ -10,6 +10,9 @@
+ #include <ctype.h>
+ #include <stdlib.h>
+ #include "local_nc.h"
++#ifdef H4_HAVE_UNISTD_H
++#include <unistd.h> /* getopt() */
++#endif
+ 
+ #include "ncdump.h"
+ #include "dumplib.h"
+diff --git a/mfhdf/ncgen/close.c b/mfhdf/ncgen/close.c
+--- a/mfhdf/ncgen/close.c
++++ b/mfhdf/ncgen/close.c
+@@ -6,9 +6,7 @@
+ 
+ #include <stdio.h>
+ #include "ncgen.h"
+-#ifdef EIP
+ #include "genlib.h"
+-#endif
+ 
+ extern void fline(), cline();
+ extern int netcdf_flag;
+diff --git a/mfhdf/ncgen/main.c b/mfhdf/ncgen/main.c
+--- a/mfhdf/ncgen/main.c
++++ b/mfhdf/ncgen/main.c
+@@ -13,6 +13,9 @@
+ #endif
+     
+ #include "ncgen.h"
++#ifdef H4_HAVE_UNISTD_H
++#include <unistd.h> /* getopt() */
++#endif
+ #include "genlib.h"
+ 
+ char *progname;			/* for error messages */
+diff --git a/mfhdf/ncgen/ncgen.y b/mfhdf/ncgen/ncgen.y
+--- a/mfhdf/ncgen/ncgen.y
++++ b/mfhdf/ncgen/ncgen.y
+@@ -13,6 +13,9 @@
+ #include        <string.h>
+ #include	<stdlib.h>
+ #include        "ncgen.h"
++
++int yylex(void);
++void yyerror(char *s);
+ 
+ typedef struct Symbol {		/* symbol table entry */
+ 	char    	*name;
+@@ -32,6 +35,7 @@
+ void define_netcdf();		/* generates all define mode stuff */
+ void load_netcdf();		/* generates variable puts */
+ void close_netcdf();		/* generates close */
++const char *nctype(nc_type);
+ 
+ void derror();			/* varargs message emitter */
+ void *emalloc(), *erealloc();	/* malloc that checks for memory exhausted */
+@@ -682,7 +686,7 @@
+ 
+ void derror();
+ 
+-yyerror(s)	/* called for yacc syntax error */
++void yyerror(s)	/* called for yacc syntax error */
+      char *s;
+ {
+ 	derror(s);
+diff --git a/mfhdf/ncgen/ncgentab.c b/mfhdf/ncgen/ncgentab.c
+--- a/mfhdf/ncgen/ncgentab.c
++++ b/mfhdf/ncgen/ncgentab.c
+@@ -121,6 +121,9 @@
+ #include	<stdlib.h>
+ #include        "ncgen.h"
+ 
++int yylex(void);
++void yyerror(char *s);
++
+ typedef struct Symbol {		/* symbol table entry */
+ 	char    	*name;
+ 	struct Symbol   *next;
+@@ -139,6 +142,7 @@
+ void define_netcdf();		/* generates all define mode stuff */
+ void load_netcdf();		/* generates variable puts */
+ void close_netcdf();		/* generates close */
++const char *nctype(nc_type);
+ 
+ void derror();			/* varargs message emitter */
+ void *emalloc(), *erealloc();	/* malloc that checks for memory exhausted */
+@@ -2350,7 +2354,7 @@
+ 
+ void derror();
+ 
+-yyerror(s)	/* called for yacc syntax error */
++void yyerror(s)	/* called for yacc syntax error */
+      char *s;
+ {
+ 	derror(s);
+diff --git a/mfhdf/hdfimport/gen_sds_floats.c b/mfhdf/hdfimport/gen_sds_floats.c
+--- a/mfhdf/hdfimport/gen_sds_floats.c
++++ b/mfhdf/hdfimport/gen_sds_floats.c
+@@ -23,6 +23,7 @@
+ #define RANK2          2  /* Number of dimensions of the SDS */
+ #define RANK3          3  /* Number of dimensions of the SDS */
+ 
++int
+ main() 
+ {
+     /************************* Variable declaration ************************/
+@@ -109,4 +110,6 @@
+     */
+     status = SDend (sd2_id);
+     status = SDend (sd3_id);
++
++    return EXIT_SUCCESS;
+ }
+diff --git a/mfhdf/hdiff/hdiff_main.c b/mfhdf/hdiff/hdiff_main.c
+--- a/mfhdf/hdiff/hdiff_main.c
++++ b/mfhdf/hdiff/hdiff_main.c
+@@ -18,6 +18,9 @@
+ #include <ctype.h>
+ #include <stdlib.h>
+ #include "hdf.h"
++#ifdef H4_HAVE_UNISTD_H
++#include <unistd.h> /* getopt() */
++#endif
+ #include "hfile.h"
+ #include "mfhdf.h"
+ #include "hdiff.h"
+-- 
+2.51.0
