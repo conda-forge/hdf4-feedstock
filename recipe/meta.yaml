@@ -15,6 +15,7 @@ source:
     - patches/debian/hdfi.h.patch
     - patches/0002-Fix-build-errors-on-Windows-for-ARM64.patch
     - patches/0003-Fix-modern-Clang-build.patch
+    - patches/0004-Fix-modern-GCC-build.patch
     - patches/debian/spelling-errors.patch
 
 build:

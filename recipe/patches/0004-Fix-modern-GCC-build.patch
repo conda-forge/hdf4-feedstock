@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Clay Warren <warren.clay@icloud.com>
+Date: Wed, 2 Sep 2026 22:30:00 -0500
+Subject: [PATCH] Fix build with modern GCC
+
+Include the standard declaration for time() in the buffer test. Also use
+xdr_int for NC_LONG on AArch64, matching the existing LP64 handling and the
+nclong definition supplied by the feedstock's 64-bit architecture patch.
+
+Adapt the relevant fixes from upstream commits 276e2c205b76 (PR #567) and
+eae84f675bbd (PR #242) to the older 4.2.15 source layout.
+
+diff --git a/hdf/test/buffer.c b/hdf/test/buffer.c
+--- a/hdf/test/buffer.c
++++ b/hdf/test/buffer.c
+@@ -48,6 +48,7 @@
+ #define TESTMASTER
+ 
+ #include "hdf.h"
++#include <time.h>
+ #ifdef H4_HAVE_SYS_TIME_H
+ #include <sys/time.h>
+ #endif
+diff --git a/mfhdf/libsrc/putget.c b/mfhdf/libsrc/putget.c
+--- a/mfhdf/libsrc/putget.c
++++ b/mfhdf/libsrc/putget.c
+@@ -665,7 +665,7 @@ xdr_NCv1data(XDR *xdrs, u_long where, nc_type type, Void *values)
+     case NC_SHORT :
+         return( xdr_NCvshort(xdrs, (unsigned)rem/2, (short *)values) ) ;
+     case NC_LONG :
+-#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ 
++#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+         return( xdr_int(xdrs, (nclong *)values) ) ;
+ #else
+         return( xdr_long(xdrs, (nclong *)values) ) ;
+-- 
+2.51.0
