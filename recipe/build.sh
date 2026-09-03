@@ -2,6 +2,10 @@
 
 set -x
 
+# HDF4 4.2.15 still relies on pre-C23 function declarations. GCC 15 defaults
+# to GNU C23, where empty parameter lists mean that no arguments are accepted.
+export CFLAGS="${CFLAGS} -std=gnu17"
+
 # Get an updated config.sub and config.guess
 cp $BUILD_PREFIX/share/gnuconfig/config.* .
 
