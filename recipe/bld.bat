@@ -26,7 +26,7 @@ nmake
 if errorlevel 1 exit 1
 
 :: Test.
-ctest
+ctest --output-on-failure -C Release
 if errorlevel 1 exit 1
 
 :: Install.

@@ -13,6 +13,6 @@ hdf4:
 libjpeg_turbo:
 - '3'
 target_platform:
-- win-64
+- win-arm64
 zlib:
 - '1'
