@@ -5,13 +5,66 @@ Subject: [PATCH] Fix build with modern Clang
 
 Backport the minimal relevant fixes from upstream commits 31a9a69476c6,
 19937e59dce4, 8a4137d60e2d, 490abfc71219, 3f61fb461d2d,
-cbbda4b312ab, 38e08e0d12d2, and 9055b673990b.
+67e11955e414, cbbda4b312ab, 38e08e0d12d2, and 9055b673990b.
 
 HDF4 4.2.15 predates C99 implicit-declaration diagnostics in modern Clang.
 Keep its existing DATAINFO_TESTER mechanism active before the public header
 is parsed; upstream removed that obsolete gate later in 218c8da49eda. Use the
-configured POSIX header for getopt because this release does not contain the
-bundled getopt header introduced later in 9be7f29942d2.
+configured POSIX headers for getopt and wait because this release does not
+contain the bundled getopt header introduced later in 9be7f29942d2.
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -769,7 +769,7 @@ AC_CHECK_FUNCS([htonl htons ntohl ntohs __builtin_bswap16 __builtin_bswap32 __bu
+ ## ======================================================================
+ ## Checks for structures
+ ## ======================================================================
+-AC_CHECK_HEADERS([sys/time.h sys/file.h sys/resource.h])
++AC_CHECK_HEADERS([sys/time.h sys/file.h sys/resource.h sys/wait.h])
+ 
+ ## ======================================================================
+ ## Checks for compiler characteristics
+diff --git a/config/cmake_ext_mod/ConfigureChecks.cmake b/config/cmake_ext_mod/ConfigureChecks.cmake
+--- a/config/cmake_ext_mod/ConfigureChecks.cmake
++++ b/config/cmake_ext_mod/ConfigureChecks.cmake
+@@ -117,6 +117,7 @@ CHECK_INCLUDE_FILE_CONCAT ("sys/socket.h"    ${HDF_PREFIX}_HAVE_SYS_SOCKET_H)
+ CHECK_INCLUDE_FILE_CONCAT ("sys/stat.h"      ${HDF_PREFIX}_HAVE_SYS_STAT_H)
+ CHECK_INCLUDE_FILE_CONCAT ("sys/time.h"      ${HDF_PREFIX}_HAVE_SYS_TIME_H)
+ CHECK_INCLUDE_FILE_CONCAT ("sys/types.h"     ${HDF_PREFIX}_HAVE_SYS_TYPES_H)
++CHECK_INCLUDE_FILE_CONCAT ("sys/wait.h"      ${HDF_PREFIX}_HAVE_SYS_WAIT_H)
+ CHECK_INCLUDE_FILE_CONCAT ("features.h"      ${HDF_PREFIX}_HAVE_FEATURES_H)
+ CHECK_INCLUDE_FILE_CONCAT ("dirent.h"        ${HDF_PREFIX}_HAVE_DIRENT_H)
+ CHECK_INCLUDE_FILE_CONCAT ("setjmp.h"        ${HDF_PREFIX}_HAVE_SETJMP_H)
+diff --git a/config/cmake/h4config.h.in b/config/cmake/h4config.h.in
+--- a/config/cmake/h4config.h.in
++++ b/config/cmake/h4config.h.in
+@@ -119,6 +119,9 @@
+ /* Define to 1 if you have the <sys/types.h> header file. */
+ #cmakedefine H4_HAVE_SYS_TYPES_H @H4_HAVE_SYS_TYPES_H@
+ 
++/* Define to 1 if you have the <sys/wait.h> header file. */
++#cmakedefine H4_HAVE_SYS_WAIT_H @H4_HAVE_SYS_WAIT_H@
++
+ /* Define if szip has encoder */
+ #cmakedefine H4_HAVE_SZIP_ENCODER @H4_HAVE_SZIP_ENCODER@
+ 
+diff --git a/hdf/util/he_file.c b/hdf/util/he_file.c
+--- a/hdf/util/he_file.c
++++ b/hdf/util/he_file.c
+@@ -16,10 +16,9 @@
+ /* --- he-file.c  --- file and annotation manipulation routines */
+ #include "he.h"
+ 
+-/* get the prototype for the wait() func. */
+-#if defined SUN | defined HP9000 | defined IRIX | defined UNIX386
++#ifdef H4_HAVE_SYS_WAIT_H
+ #include <sys/wait.h>
+-#endif /* SUN | HP9000 */
++#endif
+ #ifdef H4_HAVE_UNISTD_H
+ #include <unistd.h>
+ #endif
 
 diff --git a/mfhdf/libsrc/file.c b/mfhdf/libsrc/file.c
 --- a/mfhdf/libsrc/file.c
