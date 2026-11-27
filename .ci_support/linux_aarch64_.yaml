@@ -1,13 +1,9 @@
-BUILD:
-- aarch64-conda_cos7-linux-gnu
+DOCKER_PLATFORM:
+- linux/amd64
 c_compiler:
 - gcc
 c_compiler_version:
-- '12'
-cdt_arch:
-- aarch64
-cdt_name:
-- cos7
+- '15'
 channel_sources:
 - conda-forge
 channel_targets:
@@ -15,9 +11,15 @@ channel_targets:
 cxx_compiler:
 - gxx
 cxx_compiler_version:
-- '12'
+- '15'
 docker_image:
-- quay.io/condaforge/linux-anvil-cos7-x86_64
+- quay.io/condaforge/linux-anvil-x86_64:alma10
+fortran_compiler:
+- gfortran
+fortran_compiler_version:
+- '15'
+hdf4:
+- 4.2.15
 libjpeg_turbo:
 - '3'
 target_platform:
@@ -25,5 +27,6 @@ target_platform:
 zip_keys:
 - - c_compiler_version
   - cxx_compiler_version
+  - fortran_compiler_version
 zlib:
-- '1.2'
+- '1'

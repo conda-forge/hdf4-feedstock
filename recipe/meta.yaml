@@ -9,14 +9,13 @@ source:
   sha256: bde035ef5a1cd5fdbd0a7f1fa5c17e98bbd599300189ac4d234f16e9bb7bcb12
   patches:
     - patches/max_files.patch
-    - patches/0001-Don-t-build-ctest0-and-run-ncgen-when-not-testing.patch
     - patches/debian/64bit.patch
     - patches/debian/hdf-4.2.10-aarch64.patch
     - patches/debian/hdfi.h.patch
     - patches/debian/spelling-errors.patch
 
 build:
-  number: 7
+  number: 8
   run_exports:
     # change SONAMEs with bugfix rev.
     #    https://abi-laboratory.pro/tracker/timeline/hdf5/
@@ -24,17 +23,13 @@ build:
 
 requirements:
   build:
-    - cmake       # [win]
+    - cmake
+    - ninja
     - bison       # [not win]
     - flex        # [not win]
-    - make        # [not win]
-    # To build this on ppc64le we need to run autoreconf so:
-    - libtool     # [not win]
-    - automake    # [not win]
-    - autoconf    # [not win]
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - gnuconfig   # [unix]
+    - {{ compiler('fortran') }}  # [not win]
   host:
     - zlib
     - libjpeg-turbo
@@ -48,6 +43,10 @@ test:
     - test -f ${PREFIX}/lib/libmfhdf.a  # [not win]
     - test -f ${PREFIX}/lib/libdf${SHLIB_EXT}  # [not win]
     - test -f ${PREFIX}/lib/libmfhdf${SHLIB_EXT}  # [not win]
+    # Fortran interface (the point of this build): free-form include + libraries.
+    - test -f ${PREFIX}/include/hdf.f90  # [not win]
+    - test -f ${PREFIX}/lib/libhdf_fortran${SHLIB_EXT}  # [not win]
+    - test -f ${PREFIX}/lib/libmfhdf_fortran${SHLIB_EXT}  # [not win]
 
 about:
   home: http://www.hdfgroup.org/HDF4/
