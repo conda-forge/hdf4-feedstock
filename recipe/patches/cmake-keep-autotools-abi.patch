@@ -1,0 +1,39 @@
+Description: Keep the autotools library names and versions in the CMake build
+ The autotools build installs libdf.so.0 and libmfhdf.so.0 (libdf.0.dylib and
+ libmfhdf.0.dylib, compatibility version 1.0.0, on macOS).  The CMake build
+ names the core library libhdf and versions both 4.x, so every binary linked
+ against the autotools libraries would fail to load.  Outside Windows, which
+ already builds with CMake, keep the autotools name and versions.
+Author: Ash Pera <ashley.pera@noaa.gov>
+Forwarded: not-needed (conda-forge ABI compatibility)
+Last-Updated: 2026-11-28
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -132,7 +132,11 @@
+ #-----------------------------------------------------------------------------
+ # Set the core names of all the libraries
+ #-----------------------------------------------------------------------------
+-set (HDF4_SRC_LIB_CORENAME          "hdf")
++if (WIN32)
++  set (HDF4_SRC_LIB_CORENAME        "hdf")
++else ()
++  set (HDF4_SRC_LIB_CORENAME        "df")  # the autotools name: keeps libdf.so.0
++endif ()
+ set (HDF4_SRC_FCSTUB_LIB_CORENAME   "hdf_fcstub")
+ set (HDF4_SRC_FORTRAN_LIB_CORENAME  "hdf_fortran")
+ set (HDF4_MF_LIB_CORENAME           "mfhdf")
+@@ -244,6 +248,14 @@
+ set (HDF4_PACKAGE_BUGREPORT "help@hdfgroup.org")
+ set (HDF4_PACKAGE_SOVERSION "${H4_VERS_MAJOR}.${H4_VERS_RELEASE}.${H4_VERS_MINOR}")
+ set (HDF4_PACKAGE_SOVERSION_MAJOR "${H4_VERS_MAJOR}")
++if (NOT WIN32)
++  # Keep the autotools library ABI (libdf.so.0 / libmfhdf.so.0, Mach-O
++  # compatibility version 1.0.0) so binaries linked against it keep loading.
++  set (HDF4_PACKAGE_SOVERSION "0.0.0")
++  set (HDF4_PACKAGE_SOVERSION_MAJOR "0")
++  set (HDF4_SOVERS_INTERFACE "1")
++  set (HDF4_SOVERS_MINOR "0")
++endif ()
+ 
+ #-----------------------------------------------------------------------------
+ # Include some macros for reusable code

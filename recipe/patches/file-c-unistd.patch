@@ -1,0 +1,18 @@
+Description: Declare access() in mfhdf/libsrc/file.c
+ file.c calls access() without including <unistd.h>.  GCC 14+ and clang 16+
+ treat the implicit declaration as an error, which breaks the CMake build.
+Author: Ash Pera <ashley.pera@noaa.gov>
+Forwarded: no
+Last-Updated: 2026-11-28
+--- a/mfhdf/libsrc/file.c
++++ b/mfhdf/libsrc/file.c
+@@ -22,6 +22,9 @@
+ 
+ #include    <string.h>
+ #include    <errno.h>
++#ifndef _WIN32
++#include    <unistd.h> /* access() */
++#endif
+ #include    "local_nc.h"
+ #include    "alloc.h"
+ #include    "herr.h"

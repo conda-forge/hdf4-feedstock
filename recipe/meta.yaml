@@ -13,6 +13,9 @@ source:
     - patches/debian/hdf-4.2.10-aarch64.patch
     - patches/debian/hdfi.h.patch
     - patches/debian/spelling-errors.patch
+    - patches/file-c-unistd.patch  # access() undeclared: error under GCC 14+/clang 16+
+    - patches/lp64-aarch64-ppc64.patch  # nclong size: aarch64/ppc64 missing from 64-bit #if lists
+    - patches/cmake-keep-autotools-abi.patch  # libdf.so.0 / libmfhdf.so.0, as autotools built them
 
 build:
   number: 8
@@ -28,6 +31,7 @@ requirements:
     - bison       # [not win]
     - flex        # [not win]
     - {{ compiler('c') }}
+    - {{ stdlib("c") }}
     - {{ compiler('cxx') }}
     - {{ compiler('fortran') }}  # [not win]
   host:
@@ -35,6 +39,10 @@ requirements:
     - libjpeg-turbo
 
 test:
+  files:
+    - sdrt.f90
+  requires:
+    - {{ compiler('fortran') }}  # [not win]
   commands:
     - hdiff -V  # [not win]
     - h4_ncgen -V  # [not win]
@@ -43,10 +51,18 @@ test:
     - test -f ${PREFIX}/lib/libmfhdf.a  # [not win]
     - test -f ${PREFIX}/lib/libdf${SHLIB_EXT}  # [not win]
     - test -f ${PREFIX}/lib/libmfhdf${SHLIB_EXT}  # [not win]
+    # Same sonames as the autotools builds, so existing downstream binaries load.
+    - test -f ${PREFIX}/lib/libdf.so.0  # [linux]
+    - test -f ${PREFIX}/lib/libmfhdf.so.0  # [linux]
+    - test -f ${PREFIX}/lib/libdf.0.dylib  # [osx]
+    - test -f ${PREFIX}/lib/libmfhdf.0.dylib  # [osx]
     # Fortran interface (the point of this build): free-form include + libraries.
     - test -f ${PREFIX}/include/hdf.f90  # [not win]
     - test -f ${PREFIX}/lib/libhdf_fortran${SHLIB_EXT}  # [not win]
     - test -f ${PREFIX}/lib/libmfhdf_fortran${SHLIB_EXT}  # [not win]
+    # Write and read back an SDS and attribute through the Fortran SD API.
+    - ${FC} -I${PREFIX}/include sdrt.f90 -L${PREFIX}/lib -Wl,-rpath,${PREFIX}/lib -lmfhdf_fortran -lhdf_fortran -lmfhdf_fcstub -lhdf_fcstub -lmfhdf -ldf -o sdrt  # [not win]
+    - ./sdrt  # [not win]
 
 about:
   home: http://www.hdfgroup.org/HDF4/

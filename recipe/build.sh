@@ -16,6 +16,10 @@ set -ex
 export FFLAGS="${FFLAGS:-} -fallow-argument-mismatch"
 export FCFLAGS="${FCFLAGS:-} -fallow-argument-mismatch"
 
+# The ncgen/ncdump/hdiff tools are K&R-era C (undeclared yyerror/getopt/write,
+# implicit int), which GCC 14+ and clang 16+ reject; the libraries are clean.
+export CFLAGS="${CFLAGS:-} -Wno-error=implicit-function-declaration -Wno-error=implicit-int"
+
 mkdir build
 cd build
 
@@ -46,18 +50,6 @@ cmake ${CMAKE_ARGS} \
 
 cmake --build . -j "${CPU_COUNT}"
 cmake --install .
-
-# --- Drop-in compatibility with the historical autotools layout ---------------
-# The autotools build named the core library libdf; CMake names it libhdf.  Every
-# existing consumer links -ldf (gdal, netcdf-c's HDF4 support, TM5, ...), so keep
-# libdf as a symlink to libhdf for both the static and shared libraries.
-pushd "${PREFIX}/lib"
-for ext in a ${SHLIB_EXT}; do
-    if [[ -e "libhdf.${ext}" && ! -e "libdf.${ext}" ]]; then
-        ln -s "libhdf.${ext}" "libdf.${ext}"
-    fi
-done
-popd
 
 # The autotools build also shipped free-form .f90 copies of the Fortran include
 # files (hdf.f90, dffunc.f90, mffunc.f90), generated from the fixed-form .inc;
