@@ -1,57 +1,90 @@
 #!/bin/bash
 
-set -x
+set -ex
 
-# Get an updated config.sub and config.guess
-cp $BUILD_PREFIX/share/gnuconfig/config.* .
+# Build with CMake rather than autotools.  HDF4's autotools build refuses to
+# build the Fortran interface and shared libraries at the same time
+# (configure.ac: "Cannot build shared fortran libraries"), so the previous
+# --enable-shared build had to pass --disable-fortran.  The CMake build has no
+# such restriction, so we get shared C libraries AND the Fortran interface in a
+# single build.  See conda-forge/hdf4-feedstock#39.
 
-# The compiler flags interfere with th build and we need to overide them :-/
-if [[ $(uname) == Darwin ]]; then
-  unset CPPFLAGS
-  export CPPFLAGS="-Wl,-rpath,$PREFIX/lib -I${PREFIX}/include"
+# HDF4 4.2.15's Fortran stubs pass mismatched argument types (e.g. CHARACTER(*)
+# vs INTEGER(4)) to the same routine, which gfortran >= 10 rejects by default.
+# conda-forge ships a modern gfortran, so allow the legacy mismatch.  See
+# conda-forge/hdf4-feedstock#39.
+export FFLAGS="${FFLAGS:-} -fallow-argument-mismatch"
+export FCFLAGS="${FCFLAGS:-} -fallow-argument-mismatch"
 
-  unset LDFLAGS
-  export LDFLAGS="-L$PREFIX/lib -Wl,-rpath,$PREFIX/lib -headerpad_max_install_names"
+# The ncgen/ncdump/hdiff tools are K&R-era C (undeclared yyerror/getopt/write,
+# implicit int), which GCC 14+ and clang 16+ reject; the libraries are clean.
+export CFLAGS="${CFLAGS:-} -Wno-error=implicit-function-declaration -Wno-error=implicit-int"
+
+mkdir build
+cd build
+
+# try_run() cannot execute target binaries when cross-compiling (osx-arm64 is
+# built on osx-64); preset the printf-width probe, whose result is unused.
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
+    CMAKE_ARGS="${CMAKE_ARGS} -D H4_PRINTF_LL_TEST_RUN=0 -D H4_PRINTF_LL_TEST_RUN__TRYRUN_OUTPUT=PRINTF_LL_WIDTH=[ll]"
 fi
 
-autoreconf -vfi
+# HDF4_ENABLE_NETCDF=OFF keeps HDF4's bundled netCDF-2 API out of the package so
+# it cannot clash with the real netcdf-c (same reason the autotools build passed
+# --disable-netcdf).  With it off the mfhdf header installs as hdf4_netcdf.h.
+cmake ${CMAKE_ARGS} \
+    -G Ninja \
+    -D CMAKE_BUILD_TYPE=Release \
+    -D CMAKE_INSTALL_PREFIX="${PREFIX}" \
+    -D CMAKE_INSTALL_LIBDIR=lib \
+    -D CMAKE_PREFIX_PATH="${PREFIX}" \
+    -D BUILD_SHARED_LIBS=ON \
+    -D BUILD_STATIC_LIBS=ON \
+    -D HDF4_BUILD_FORTRAN=ON \
+    -D HDF4_BUILD_JAVA=OFF \
+    -D HDF4_ENABLE_NETCDF=OFF \
+    -D HDF4_BUILD_XDR_LIB=OFF \
+    -D HDF4_BUILD_HL_LIB=ON \
+    -D HDF4_BUILD_TOOLS=ON \
+    -D HDF4_BUILD_UTILS=ON \
+    -D HDF4_BUILD_EXAMPLES=OFF \
+    -D HDF4_ENABLE_Z_LIB_SUPPORT=ON \
+    -D HDF4_ENABLE_JPEG_LIB_SUPPORT=ON \
+    -D HDF4_ENABLE_SZIP_SUPPORT=OFF \
+    -D BUILD_TESTING=OFF \
+    ..
 
-# The --enable-silent-rules is needed because Travis CI dies on the long output from this build.
-./configure --prefix=${PREFIX}\
-            --host=$HOST \
-            --enable-linux-lfs \
-            --enable-silent-rules \
-            --enable-shared \
-            --with-ssl \
-            --with-zlib \
-            --with-jpeg \
-            --disable-netcdf \
-            --disable-fortran
+cmake --build . -j "${CPU_COUNT}"
+cmake --install .
 
-make
+# The autotools build also shipped free-form .f90 copies of the Fortran include
+# files (hdf.f90, dffunc.f90, mffunc.f90), generated from the fixed-form .inc;
+# the CMake build installs only the .inc.  Free-form consumers include e.g.
+# "hdf.f90", so regenerate them with HDF4's own conversion (hdf/src/Makefile.am:
+# .inc.f90 rule): turn fixed-form C-comments and column-6 continuations into
+# free-form.
+pushd "${PREFIX}/include"
+for base in hdf dffunc mffunc; do
+    if [[ -f "${base}.inc" && ! -f "${base}.f90" ]]; then
+        sed -e 's/^[cC]/!/' -e 's/^     [^ ]/     \&/' "${base}.inc" > "${base}.f90"
+    fi
+done
+popd
 
-# ncgen segfaults on macOS
-if [[ $(uname) != Darwin ]]; then
-if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" != "1" || "${CROSSCOMPILING_EMULATOR}" != "" ]]; then
-# The following tests seems to fail on ppc64le when runing on azure with emulation
-# Testing reading of netCDF file using the SDxxx interface (tnetcdf.c)  
-# *** Routine netCDF Read Test 1. SDstart failed on file test1.nc FAILED at line 176 ***
-# *** Routine SDstart FAILED at line 83 ***
-if [[ "${target_platform}" != "linux-ppc64le" ]]; then
-make check
-fi
-fi
-fi
+# Avoid clashing binary names with the netcdf package (the autotools recipe did
+# the same rename).  Only present if the tools were built.
+for tool in ncdump ncgen; do
+    if [[ -f "${PREFIX}/bin/${tool}" ]]; then
+        mv "${PREFIX}/bin/${tool}" "${PREFIX}/bin/h4_${tool}"
+    fi
+done
 
-make install
+# Do not ship files the autotools build did not: netcdf.inc (netCDF-2 Fortran
+# include) clobbers netcdf-fortran's, error.h shadows glibc's <error.h>, and
+# alloc.h/glist.h are internal and unused by any installed header.  The
+# pkg-config file is new and malformed (-l/abs/path/libjpeg).
+rm -f "${PREFIX}"/include/{netcdf.inc,error.h,alloc.h,glist.h}
+rm -f "${PREFIX}"/lib/pkgconfig/df-*.pc
 
-
-# Remove man pages.
-rm -rf ${PREFIX}/share
-
-# Avoid clashing names with netcdf.
-mv ${PREFIX}/bin/ncdump ${PREFIX}/bin/h4_ncdump
-mv ${PREFIX}/bin/ncgen ${PREFIX}/bin/h4_ncgen
-
-# People usually Google these.
-rm -rf ${PREFIX}/examples
+# Strip docs/man/examples we do not ship.
+rm -rf "${PREFIX}/share/man" "${PREFIX}/share/hdf4_examples" "${PREFIX}/examples" || true

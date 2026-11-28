@@ -1,14 +1,22 @@
 c_compiler:
-- vs2019
+- vs
+c_compiler_version:
+- '2022'
+c_stdlib:
+- vs
 channel_sources:
 - conda-forge
 channel_targets:
 - conda-forge main
 cxx_compiler:
-- vs2019
+- vs
+cxx_compiler_version:
+- '2022'
+hdf4:
+- 4.2.15
 libjpeg_turbo:
 - '3'
 target_platform:
 - win-64
 zlib:
-- '1.2'
+- '1'

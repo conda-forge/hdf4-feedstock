@@ -1,0 +1,190 @@
+Description: Treat aarch64 (and ppc64 in the Fortran jackets) as LP64 everywhere nclong is
+ debian/64bit.patch makes nclong an int on __aarch64__ (netcdf.h.in), but the
+ matching 64-bit #if lists in putget.c, xdrposix.c and fortran/jackets.c.in
+ still name only __x86_64__ (and, in jackets.c.in, not __powerpc64__).  On
+ those targets the code passes a 4-byte nclong as an 8-byte long, which current
+ compilers reject (-Wincompatible-pointer-types) and which would corrupt
+ memory.  Add the missing architectures so every list agrees with netcdf.h.
+Author: Ash Pera <ashley.pera@noaa.gov>
+Forwarded: no
+Last-Updated: 2026-11-28
+--- a/mfhdf/fortran/jackets.c.in
++++ b/mfhdf/fortran/jackets.c.in
+@@ -34,7 +34,7 @@
+ 
+ struct ncfils {            /* This will be a common block from Fortran */
+     double dd;
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+     int ll;
+ #else
+     long ll;
+@@ -65,7 +65,7 @@
+ 
+ struct ncfils {            /* This will be a common block from Fortran */
+     double dd;
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+     int ll;
+ #else
+     long ll;
+@@ -420,7 +420,7 @@
+ }
+ #endif /* FORTRAN_HAS_NO_SHORT */
+ 
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ /*
+  * Convert multi-dimensional array of NCLONGs stored in ints to packed
+  * array of longs, in malloc'ed space.  Returns pointer to longs or NULL
+@@ -908,7 +908,7 @@
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long          longs = *(int *)value;
+@@ -1022,7 +1022,7 @@
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long *longs = itol (value, ncount, ndims);
+@@ -1133,7 +1133,7 @@
+     tmpbasis    = nctypelen(NC_LONG);
+     else
+ #endif
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+     if (datatype == NC_LONG)
+     tmpbasis    = sizeof(int);
+     else
+@@ -1190,7 +1190,7 @@
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long *longs = itolg (value, ncount, nbasis, ndims);
+@@ -1326,7 +1326,7 @@
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long          longs;
+@@ -1468,7 +1468,7 @@
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long iocount = dimprod (ncount, ndims);    /* product of dimensions */
+@@ -1606,7 +1606,7 @@
+     tmpbasis    = nctypelen(NC_LONG);
+     else
+ #endif
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+     if (datatype == NC_LONG)
+     tmpbasis    = sizeof(int);
+     else
+@@ -1677,7 +1677,7 @@
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long iocount = dimprod (ncount, ndims);    /* product of dimensions */
+@@ -1843,7 +1843,7 @@
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ #ifdef HDF
+     if ((nc_type) *datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long *longs = itol (value, attlen, 1);
+@@ -2008,7 +2008,7 @@
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+ /* EIP  We need to use int buffer to read data in on the platforms where long is 8 bytes
+--- a/mfhdf/libsrc/putget.c
++++ b/mfhdf/libsrc/putget.c
+@@ -665,7 +665,7 @@
+     case NC_SHORT :
+         return( xdr_NCvshort(xdrs, (unsigned)rem/2, (short *)values) ) ;
+     case NC_LONG :
+-#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ 
++#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__ 
+         return( xdr_int(xdrs, (nclong *)values) ) ;
+ #else
+         return( xdr_long(xdrs, (nclong *)values) ) ;
+--- a/mfhdf/libsrc/xdrposix.c
++++ b/mfhdf/libsrc/xdrposix.c
+@@ -262,7 +262,7 @@
+ 
+ static bool_t   xdrposix_getlong();
+ static bool_t   xdrposix_putlong();
+-#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ static bool_t   xdrposix_getint();
+ static bool_t   xdrposix_putint();
+ #endif
+@@ -276,7 +276,7 @@
+ #if (defined __sun && defined _LP64)
+ static rpc_inline_t *    xdrposix_inline();
+ #else
+-#if ((defined __x86_64__ ) && !(defined __sun && defined _LP64)) || defined __powerpc64__
++#if ((defined __x86_64__ ) && !(defined __sun && defined _LP64)) || defined __powerpc64__ || defined __aarch64__
+ static int32_t *    xdrposix_inline();
+ #else
+ static netlong *    xdrposix_inline();
+@@ -302,9 +302,9 @@
+     xdrposix_getpos,    /* get offset in the stream */
+     xdrposix_setpos,    /* set offset in the stream */
+     xdrposix_inline,    /* prime stream for inline macros */
+-#if (defined __sun && defined _LP64) || defined __x86_64__ || defined __powerpc64__
++#if (defined __sun && defined _LP64) || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+     xdrposix_destroy,   /* destroy stream */
+-#if !(defined __x86_64__) && !(defined __powerpc64__) || (defined  __sun && defined _LP64) /* i.e. we are on SUN/Intel in 64-bit mode */
++#if !(defined __x86_64__) && !(defined __powerpc64__) && !(defined __aarch64__) || (defined  __sun && defined _LP64) /* i.e. we are on SUN/Intel in 64-bit mode */
+     NULL,               /* no xdr_control function defined */
+ #endif
+     /* Solaris 64-bit (arch=v9 and arch=amd64) has 64 bits long and 32 bits int. */
+@@ -560,7 +560,7 @@
+ #if (defined __sun && defined _LP64)
+ static rpc_inline_t *
+ #else
+-#if ((defined  __x86_64__) && !(defined __sun && defined _LP64)) || defined __powerpc64__
++#if ((defined  __x86_64__) && !(defined __sun && defined _LP64)) || defined __powerpc64__ || defined __aarch64__
+ static int32_t *
+ #else
+ static netlong *
+@@ -581,7 +581,7 @@
+     return (NULL);
+ }
+ 
+-#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64  || defined __x86_64__ || defined __powerpc64__
++#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64  || defined __x86_64__ || defined __powerpc64__ || defined __aarch64__
+ 
+ static bool_t
+ xdrposix_getint(xdrs, lp)
