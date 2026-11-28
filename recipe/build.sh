@@ -23,6 +23,12 @@ export CFLAGS="${CFLAGS:-} -Wno-error=implicit-function-declaration -Wno-error=i
 mkdir build
 cd build
 
+# try_run() cannot execute target binaries when cross-compiling (osx-arm64 is
+# built on osx-64); preset the printf-width probe, whose result is unused.
+if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
+    CMAKE_ARGS="${CMAKE_ARGS} -D H4_PRINTF_LL_TEST_RUN=0 -D H4_PRINTF_LL_TEST_RUN__TRYRUN_OUTPUT=PRINTF_LL_WIDTH=[ll]"
+fi
+
 # HDF4_ENABLE_NETCDF=OFF keeps HDF4's bundled netCDF-2 API out of the package so
 # it cannot clash with the real netcdf-c (same reason the autotools build passed
 # --disable-netcdf).  With it off the mfhdf header installs as hdf4_netcdf.h.
