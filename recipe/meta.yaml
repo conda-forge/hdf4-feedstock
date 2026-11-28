@@ -56,6 +56,9 @@ test:
     - test -f ${PREFIX}/lib/libmfhdf.so.0  # [linux]
     - test -f ${PREFIX}/lib/libdf.0.dylib  # [osx]
     - test -f ${PREFIX}/lib/libmfhdf.0.dylib  # [osx]
+    # Must not clobber netcdf-fortran's netcdf.inc or shadow glibc's <error.h>.
+    - test ! -e ${PREFIX}/include/netcdf.inc  # [not win]
+    - test ! -e ${PREFIX}/include/error.h  # [not win]
     # Fortran interface (the point of this build): free-form include + libraries.
     - test -f ${PREFIX}/include/hdf.f90  # [not win]
     - test -f ${PREFIX}/lib/libhdf_fortran${SHLIB_EXT}  # [not win]

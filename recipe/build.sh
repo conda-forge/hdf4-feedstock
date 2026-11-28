@@ -73,5 +73,12 @@ for tool in ncdump ncgen; do
     fi
 done
 
+# Do not ship files the autotools build did not: netcdf.inc (netCDF-2 Fortran
+# include) clobbers netcdf-fortran's, error.h shadows glibc's <error.h>, and
+# alloc.h/glist.h are internal and unused by any installed header.  The
+# pkg-config file is new and malformed (-l/abs/path/libjpeg).
+rm -f "${PREFIX}"/include/{netcdf.inc,error.h,alloc.h,glist.h}
+rm -f "${PREFIX}"/lib/pkgconfig/df-*.pc
+
 # Strip docs/man/examples we do not ship.
 rm -rf "${PREFIX}/share/man" "${PREFIX}/share/hdf4_examples" "${PREFIX}/examples" || true
